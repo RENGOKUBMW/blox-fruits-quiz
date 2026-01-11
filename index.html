@@ -1,36 +1,50 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Blox Fruits Quiz</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <style>
-    body { background:#0f172a; color:white; font-family:Arial; padding:20px; }
-    h1,h2 { text-align:center; }
-    button {
-      width:100%; padding:12px; margin:5px 0;
-      background:#22c55e; border:none; border-radius:8px;
-      font-size:16px; color:black;
-    }
-    .box {
-      background:#1e293b; padding:15px;
-      border-radius:10px; margin-top:10px;
-    }
-    input {
-      width:100%; padding:8px; margin-top:5px;
-      border-radius:6px; border:none;
-    }
-    .wrong { color:#f87171; }
-    .correct { color:#4ade80; }
-  </style>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Blox Fruits Quiz</title>
+<style>
+body{
+  background:#020617;
+  color:white;
+  font-family:Arial;
+  padding:20px;
+}
+.card{
+  background:#0f172a;
+  padding:15px;
+  border-radius:12px;
+  margin-bottom:12px;
+}
+button{
+  width:100%;
+  padding:12px;
+  margin-top:10px;
+  background:#22c55e;
+  border:none;
+  border-radius:8px;
+  font-size:16px;
+}
+input{
+  width:100%;
+  padding:10px;
+  border-radius:6px;
+  border:none;
+  margin-top:8px;
+}
+.correct{color:#4ade80}
+.wrong{color:#f87171}
+</style>
 </head>
 
 <body>
 
 <h1>🍍 Blox Fruits Quiz</h1>
 
-<div id="start">
-  <input id="player" placeholder="Enter your name">
-  <button onclick="showLevels()">Start</button>
+<div id="login" class="card">
+  <input id="name" placeholder="Your Name">
+  <input id="pass" placeholder="Password">
+  <button onclick="login()">Enter Quiz</button>
 </div>
 
 <div id="levels" style="display:none">
@@ -46,93 +60,92 @@
 <div id="leaderboard"></div>
 
 <script>
-let currentLevel="", score=0, playerName="";
+const PASSWORD="BLOX FRUITS 15.2MIL";
+let player="",score=0,levelNow="";
 
-const quizData = {
+const quiz={
 easy:[
- {q:"Which fruit is best for travel?", a:"light"},
- {q:"Current max level?", a:"2800"},
- {q:"Which sea do players start in?", a:"first sea"}
+ {q:"Which sea do players start in?",
+  answers:["first sea","sea 1","sea one"]},
+ {q:"Best fruit for fast travel?",
+  answers:["light"]},
+ {q:"Current max level?",
+  answers:["2800"]}
 ],
 normal:[
- {q:"Which sword is needed for True Triple Katana?", a:"saddi shisui wando"},
- {q:"Which NPC gives Instinct V2?", a:"usopp"},
- {q:"Which fruit walks on water?", a:"ice"}
+ {q:"Fruit that can walk on water?",
+  answers:["ice"]},
+ {q:"NPC who gives Instinct V2?",
+  answers:["usopp"]},
+ {q:"Which sea has Mirage Island?",
+  answers:["third sea","sea 3","sea three"]}
 ],
 hard:[
- {q:"Which sword is required with Tushita to get CDK?", a:"yama"},
- {q:"Which boss drops Blue Gear access?", a:"mirage"},
- {q:"Which race is fastest on land?", a:"mink"}
+ {q:"Sword needed with Tushita to get CDK?",
+  answers:["yama"]},
+ {q:"Race fastest on land?",
+  answers:["mink"]},
+ {q:"Boss related to Blue Gear?",
+  answers:["mirage","mirage island"]}
 ],
 xhard:[
- {q:"Which sword is most used in PvP combos?", a:"cursed dual katana"},
- {q:"Which fruit awakening dominates PvP?", a:"dough"},
- {q:"Which sea is required for Race V4?", a:"third sea"}
+ {q:"Most used PvP sword?",
+  answers:["cursed dual katana","cdk"]},
+ {q:"Fruit dominating PvP?",
+  answers:["dough"]},
+ {q:"Sea needed for Race V4?",
+  answers:["third sea","sea 3","sea three"]}
 ],
 xxhard:[
- {q:"Explain a Dough + CDK combo and why it works", a:"subjective"},
- {q:"Create a Leopard PvP combo and explain timing", a:"subjective"}
+ {q:"Explain a Dough + CDK combo and how you know it works",
+  subjective:true},
+ {q:"Create Leopard combo with timing explanation",
+  subjective:true}
 ]
 };
 
-function showLevels(){
-  playerName=document.getElementById("player").value.trim();
-  if(!playerName){ alert("Enter name"); return; }
-  document.getElementById("start").style.display="none";
+function login(){
+  if(document.getElementById("pass").value!==PASSWORD){
+    alert("Wrong password");
+    return;
+  }
+  player=document.getElementById("name").value;
+  document.getElementById("login").style.display="none";
   document.getElementById("levels").style.display="block";
 }
 
-function start(level){
-  currentLevel=level; score=0;
+function start(lvl){
+  levelNow=lvl; score=0;
   document.getElementById("levels").style.display="none";
-  const qDiv=document.getElementById("quiz");
-  qDiv.innerHTML="";
-  quizData[level].forEach((x,i)=>{
-    qDiv.innerHTML+=`
-    <div class="box">
+  const q=document.getElementById("quiz");
+  q.innerHTML="";
+  quiz[lvl].forEach((x,i)=>{
+    q.innerHTML+=`
+    <div class="card">
       <b>Q${i+1}. ${x.q}</b>
       <input id="a${i}">
     </div>`;
   });
-  qDiv.innerHTML+=`<button onclick="submitQuiz()">Submit</button>`;
+  q.innerHTML+=`<button onclick="submit()">Submit</button>`;
 }
 
-function submitQuiz(){
-  let res="<h2>Results</h2>";
-  quizData[currentLevel].forEach((x,i)=>{
+function submit(){
+  let out="<h2>Result</h2>";
+  quiz[levelNow].forEach((x,i)=>{
     let ans=document.getElementById("a"+i).value.toLowerCase();
-    if(x.a==="subjective"){
+    if(x.subjective){
       score+=5;
-      res+=`<p class="correct">Q${i+1}: Subjective – Checked ✔</p>`;
-    } else if(ans.includes(x.a)){
+      out+=`<p class="correct">Q${i+1}: Subjective ✔</p>`;
+    }else if(x.answers.some(a=>ans.includes(a))){
       score+=5;
-      res+=`<p class="correct">Q${i+1}: Correct ✔</p>`;
-    } else {
-      res+=`<p class="wrong">Q${i+1}: Wrong ❌ | Answer: ${x.a}</p>`;
+      out+=`<p class="correct">Q${i+1}: Correct ✔</p>`;
+    }else{
+      out+=`<p class="wrong">Q${i+1}: Wrong ❌ (Accepted: ${x.answers.join(", ")})</p>`;
     }
   });
-
-  saveScore();
   document.getElementById("quiz").innerHTML="";
   document.getElementById("result").innerHTML=
-    `<h2>Score: ${score}</h2>`+res;
-  showLeaderboard();
-}
-
-function saveScore(){
-  let board=JSON.parse(localStorage.getItem("bfBoard")||"[]");
-  board.push({name:playerName,score:score});
-  board.sort((a,b)=>b.score-a.score);
-  localStorage.setItem("bfBoard",JSON.stringify(board.slice(0,5)));
-}
-
-function showLeaderboard(){
-  let board=JSON.parse(localStorage.getItem("bfBoard")||"[]");
-  let html="<h2>🏆 Leaderboard</h2>";
-  board.forEach((x,i)=>{
-    html+=`<p>${i+1}. ${x.name} - ${x.score}</p>`;
-  });
-  document.getElementById("leaderboard").innerHTML=html;
+    `<h2>Score: ${score}</h2>`+out;
 }
 </script>
 
