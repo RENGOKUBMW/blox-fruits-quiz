@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Blox Fruits Quiz</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body {
+      background: #0f172a;
+      color: white;
+      font-family: Arial;
+      padding: 20px;
+    }
+    .box {
+      max-width: 600px;
+      margin: auto;
+      background: #020617;
+      padding: 20px;
+      border-radius: 10px;
+    }
+    h1 { text-align: center; }
+    .q { margin-top: 20px; font-size: 18px; }
+    .hint { color: #94a3b8; font-size: 14px; }
+    input {
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+      border-radius: 6px;
+      border: none;
+      font-size: 16px;
+    }
+    button {
+      margin-top: 20px;
+      width: 100%;
+      padding: 12px;
+      background: #22c55e;
+      border: none;
+      border-radius: 8px;
+      font-size: 18px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="box">
+<h1>🏴‍☠️ Blox Fruits Quiz</h1>
+
+<div class="q">1. Identify the sword</div>
+<div class="hint">
+Hint 1: Cannot be bought<br>
+Hint 2: Sea event related
+</div>
+
+<input id="a1" placeholder="Your answer">
+
+<button onclick="check()">Submit</button>
+
+<p id="result"></p>
+</div>
+
+<script>
+function check() {
+  let ans = document.getElementById("a1").value.toLowerCase().trim();
+  if (ans === "pole v2" || ans === "polev2") {
+    document.getElementById("result").innerText = "✅ Correct!";
+  } else {
+    document.getElementById("result").innerText = "❌ Wrong! Correct answer: Pole V2";
+  }
+}
+</script>
+
+</body>
+</html>
