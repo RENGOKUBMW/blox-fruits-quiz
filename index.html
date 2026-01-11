@@ -4,36 +4,23 @@
   <title>Blox Fruits Quiz</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
-    body {
-      background:#0f172a;
-      color:white;
-      font-family:Arial;
-      padding:20px;
-    }
-    h1 {text-align:center;}
+    body { background:#0f172a; color:white; font-family:Arial; padding:20px; }
+    h1,h2 { text-align:center; }
     button {
-      padding:10px;
-      margin:5px;
-      width:100%;
-      background:#22c55e;
-      border:none;
-      color:black;
-      font-size:16px;
-      border-radius:8px;
+      width:100%; padding:12px; margin:5px 0;
+      background:#22c55e; border:none; border-radius:8px;
+      font-size:16px; color:black;
     }
     .box {
-      background:#1e293b;
-      padding:15px;
-      border-radius:10px;
-      margin-top:15px;
+      background:#1e293b; padding:15px;
+      border-radius:10px; margin-top:10px;
     }
     input {
-      width:100%;
-      padding:8px;
-      margin-top:5px;
-      border-radius:6px;
-      border:none;
+      width:100%; padding:8px; margin-top:5px;
+      border-radius:6px; border:none;
     }
+    .wrong { color:#f87171; }
+    .correct { color:#4ade80; }
   </style>
 </head>
 
@@ -41,7 +28,12 @@
 
 <h1>🍍 Blox Fruits Quiz</h1>
 
-<div id="levels">
+<div id="start">
+  <input id="player" placeholder="Enter your name">
+  <button onclick="showLevels()">Start</button>
+</div>
+
+<div id="levels" style="display:none">
   <button onclick="start('easy')">Easy</button>
   <button onclick="start('normal')">Normal</button>
   <button onclick="start('hard')">Hard</button>
@@ -49,77 +41,98 @@
   <button onclick="start('xxhard')">Extra Extra Hard</button>
 </div>
 
-<div id="quiz" style="display:none"></div>
-
-<h2 id="score"></h2>
+<div id="quiz"></div>
+<div id="result"></div>
+<div id="leaderboard"></div>
 
 <script>
-let marks = 0;
+let currentLevel="", score=0, playerName="";
 
-const data = {
-easy: [
-  {q:"Which fruit is easiest for grinding?", a:"light"},
-  {q:"Max level currently?", a:"2800"}
+const quizData = {
+easy:[
+ {q:"Which fruit is best for travel?", a:"light"},
+ {q:"Current max level?", a:"2800"},
+ {q:"Which sea do players start in?", a:"first sea"}
 ],
-
-normal: [
-  {q:"Which sword is required for True Triple Katana?", a:"saddi shisui wando"},
-  {q:"Which NPC gives instinct v2?", a:"usopp"}
+normal:[
+ {q:"Which sword is needed for True Triple Katana?", a:"saddi shisui wando"},
+ {q:"Which NPC gives Instinct V2?", a:"usopp"},
+ {q:"Which fruit walks on water?", a:"ice"}
 ],
-
-hard: [
-  {q:"Which race v4 uses whirlpool ability?", a:"shark"},
-  {q:"Which island spawns Dough King?", a:"cake land"}
+hard:[
+ {q:"Which sword is required with Tushita to get CDK?", a:"yama"},
+ {q:"Which boss drops Blue Gear access?", a:"mirage"},
+ {q:"Which race is fastest on land?", a:"mink"}
 ],
-
-xhard: [
-  {q:"Which fruit awakening is best for PvP?", a:"dough"},
-  {q:"Which sword is used in most PvP combos?", a:"cursed dual katana"}
+xhard:[
+ {q:"Which sword is most used in PvP combos?", a:"cursed dual katana"},
+ {q:"Which fruit awakening dominates PvP?", a:"dough"},
+ {q:"Which sea is required for Race V4?", a:"third sea"}
 ],
-
-xxhard: [
-  {
-    q:"Name a Dough + CDK PvP combo AND explain how you know it works",
-    a:"subjective"
-  },
-  {
-    q:"Create a combo using Leopard + Godhuman and explain timing",
-    a:"subjective"
-  }
+xxhard:[
+ {q:"Explain a Dough + CDK combo and why it works", a:"subjective"},
+ {q:"Create a Leopard PvP combo and explain timing", a:"subjective"}
 ]
 };
 
-function start(level){
-  document.getElementById("levels").style.display="none";
-  const quiz = document.getElementById("quiz");
-  quiz.style.display="block";
-  quiz.innerHTML="";
-  marks=0;
-
-  data[level].forEach((item,i)=>{
-    quiz.innerHTML+=`
-      <div class="box">
-        <b>Q${i+1}. ${item.q}</b>
-        <input id="a${i}">
-      </div>
-    `;
-  });
-
-  quiz.innerHTML+=`<button onclick="check('${level}')">Submit</button>`;
+function showLevels(){
+  playerName=document.getElementById("player").value.trim();
+  if(!playerName){ alert("Enter name"); return; }
+  document.getElementById("start").style.display="none";
+  document.getElementById("levels").style.display="block";
 }
 
-function check(level){
-  data[level].forEach((item,i)=>{
+function start(level){
+  currentLevel=level; score=0;
+  document.getElementById("levels").style.display="none";
+  const qDiv=document.getElementById("quiz");
+  qDiv.innerHTML="";
+  quizData[level].forEach((x,i)=>{
+    qDiv.innerHTML+=`
+    <div class="box">
+      <b>Q${i+1}. ${x.q}</b>
+      <input id="a${i}">
+    </div>`;
+  });
+  qDiv.innerHTML+=`<button onclick="submitQuiz()">Submit</button>`;
+}
+
+function submitQuiz(){
+  let res="<h2>Results</h2>";
+  quizData[currentLevel].forEach((x,i)=>{
     let ans=document.getElementById("a"+i).value.toLowerCase();
-    if(item.a==="subjective"){
-      marks+=5; // full marks for explanation
-    } else if(ans.includes(item.a)){
-      marks+=5;
+    if(x.a==="subjective"){
+      score+=5;
+      res+=`<p class="correct">Q${i+1}: Subjective – Checked ✔</p>`;
+    } else if(ans.includes(x.a)){
+      score+=5;
+      res+=`<p class="correct">Q${i+1}: Correct ✔</p>`;
+    } else {
+      res+=`<p class="wrong">Q${i+1}: Wrong ❌ | Answer: ${x.a}</p>`;
     }
   });
 
-  document.getElementById("score").innerHTML=
-    "🏆 Your Score: "+marks+" / "+(data[level].length*5);
+  saveScore();
+  document.getElementById("quiz").innerHTML="";
+  document.getElementById("result").innerHTML=
+    `<h2>Score: ${score}</h2>`+res;
+  showLeaderboard();
+}
+
+function saveScore(){
+  let board=JSON.parse(localStorage.getItem("bfBoard")||"[]");
+  board.push({name:playerName,score:score});
+  board.sort((a,b)=>b.score-a.score);
+  localStorage.setItem("bfBoard",JSON.stringify(board.slice(0,5)));
+}
+
+function showLeaderboard(){
+  let board=JSON.parse(localStorage.getItem("bfBoard")||"[]");
+  let html="<h2>🏆 Leaderboard</h2>";
+  board.forEach((x,i)=>{
+    html+=`<p>${i+1}. ${x.name} - ${x.score}</p>`;
+  });
+  document.getElementById("leaderboard").innerHTML=html;
 }
 </script>
 
