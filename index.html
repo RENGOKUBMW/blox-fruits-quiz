@@ -5,66 +5,121 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
     body {
-      background: #0f172a;
-      color: white;
-      font-family: Arial;
-      padding: 20px;
+      background:#0f172a;
+      color:white;
+      font-family:Arial;
+      padding:20px;
+    }
+    h1 {text-align:center;}
+    button {
+      padding:10px;
+      margin:5px;
+      width:100%;
+      background:#22c55e;
+      border:none;
+      color:black;
+      font-size:16px;
+      border-radius:8px;
     }
     .box {
-      max-width: 600px;
-      margin: auto;
-      background: #020617;
-      padding: 20px;
-      border-radius: 10px;
+      background:#1e293b;
+      padding:15px;
+      border-radius:10px;
+      margin-top:15px;
     }
-    h1 { text-align: center; }
-    .q { margin-top: 20px; font-size: 18px; }
-    .hint { color: #94a3b8; font-size: 14px; }
     input {
-      width: 100%;
-      padding: 10px;
-      margin-top: 10px;
-      border-radius: 6px;
-      border: none;
-      font-size: 16px;
-    }
-    button {
-      margin-top: 20px;
-      width: 100%;
-      padding: 12px;
-      background: #22c55e;
-      border: none;
-      border-radius: 8px;
-      font-size: 18px;
+      width:100%;
+      padding:8px;
+      margin-top:5px;
+      border-radius:6px;
+      border:none;
     }
   </style>
 </head>
+
 <body>
 
-<div class="box">
-<h1>🏴‍☠️ Blox Fruits Quiz</h1>
+<h1>🍍 Blox Fruits Quiz</h1>
 
-<div class="q">1. Identify the sword</div>
-<div class="hint">
-Hint 1: Cannot be bought<br>
-Hint 2: Sea event related
+<div id="levels">
+  <button onclick="start('easy')">Easy</button>
+  <button onclick="start('normal')">Normal</button>
+  <button onclick="start('hard')">Hard</button>
+  <button onclick="start('xhard')">Extra Hard</button>
+  <button onclick="start('xxhard')">Extra Extra Hard</button>
 </div>
 
-<input id="a1" placeholder="Your answer">
+<div id="quiz" style="display:none"></div>
 
-<button onclick="check()">Submit</button>
-
-<p id="result"></p>
-</div>
+<h2 id="score"></h2>
 
 <script>
-function check() {
-  let ans = document.getElementById("a1").value.toLowerCase().trim();
-  if (ans === "pole v2" || ans === "polev2") {
-    document.getElementById("result").innerText = "✅ Correct!";
-  } else {
-    document.getElementById("result").innerText = "❌ Wrong! Correct answer: Pole V2";
+let marks = 0;
+
+const data = {
+easy: [
+  {q:"Which fruit is easiest for grinding?", a:"light"},
+  {q:"Max level currently?", a:"2800"}
+],
+
+normal: [
+  {q:"Which sword is required for True Triple Katana?", a:"saddi shisui wando"},
+  {q:"Which NPC gives instinct v2?", a:"usopp"}
+],
+
+hard: [
+  {q:"Which race v4 uses whirlpool ability?", a:"shark"},
+  {q:"Which island spawns Dough King?", a:"cake land"}
+],
+
+xhard: [
+  {q:"Which fruit awakening is best for PvP?", a:"dough"},
+  {q:"Which sword is used in most PvP combos?", a:"cursed dual katana"}
+],
+
+xxhard: [
+  {
+    q:"Name a Dough + CDK PvP combo AND explain how you know it works",
+    a:"subjective"
+  },
+  {
+    q:"Create a combo using Leopard + Godhuman and explain timing",
+    a:"subjective"
   }
+]
+};
+
+function start(level){
+  document.getElementById("levels").style.display="none";
+  const quiz = document.getElementById("quiz");
+  quiz.style.display="block";
+  quiz.innerHTML="";
+  marks=0;
+
+  data[level].forEach((item,i)=>{
+    quiz.innerHTML+=`
+      <div class="box">
+        <b>Q${i+1}. ${item.q}</b>
+        <input id="a${i}">
+      </div>
+    `;
+  });
+
+  quiz.innerHTML+=`<button onclick="check('${level}')">Submit</button>`;
+}
+
+function check(level){
+  data[level].forEach((item,i)=>{
+    let ans=document.getElementById("a"+i).value.toLowerCase();
+    if(item.a==="subjective"){
+      marks+=5; // full marks for explanation
+    } else if(ans.includes(item.a)){
+      marks+=5;
+    }
+  });
+
+  document.getElementById("score").innerHTML=
+    "🏆 Your Score: "+marks+" / "+(data[level].length*5);
 }
 </script>
 
