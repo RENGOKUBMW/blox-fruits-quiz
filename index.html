@@ -3,6 +3,7 @@
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Blox Fruits Quiz</title>
+
 <style>
 body{
   background:#020617;
@@ -19,7 +20,7 @@ body{
 button{
   width:100%;
   padding:12px;
-  margin-top:10px;
+  margin-top:8px;
   background:#22c55e;
   border:none;
   border-radius:8px;
@@ -34,6 +35,7 @@ input{
 }
 .correct{color:#4ade80}
 .wrong{color:#f87171}
+.hidden{display:none}
 </style>
 </head>
 
@@ -43,11 +45,11 @@ input{
 
 <div id="login" class="card">
   <input id="name" placeholder="Your Name">
-  <input id="pass" placeholder="Password">
+  <input id="quizPass" placeholder="Quiz Password">
   <button onclick="login()">Enter Quiz</button>
 </div>
 
-<div id="levels" style="display:none">
+<div id="levels" class="hidden">
   <button onclick="start('easy')">Easy</button>
   <button onclick="start('normal')">Normal</button>
   <button onclick="start('hard')">Hard</button>
@@ -57,66 +59,77 @@ input{
 
 <div id="quiz"></div>
 <div id="result"></div>
-<div id="leaderboard"></div>
+
+<div class="card">
+  <input id="adminPass" placeholder="Admin Password">
+  <button onclick="showAnswers()">Admin: Show Answers</button>
+  <div id="answers" class="hidden"></div>
+</div>
 
 <script>
-const PASSWORD="PASSWORD";
+const QUIZ_PASSWORD="SEA 4 finally";
+const ADMIN_PASSWORD="A GOD HAS ARRIVED THEGOD_RENGOKU";
+
 let player="",score=0,levelNow="";
 
 const quiz={
 easy:[
  {q:"Which sea do players start in?",
-  answers:["first sea","sea 1","sea one"]},
- {q:"Best fruit for fast travel?",
-  answers:["light"]},
- {q:"Current max level?",
-  answers:["2800"]}
+  a:["first sea","sea 1","sea one"]},
+ {q:"Best fruit for travel?",
+  a:["light"]},
+ {q:"Max level currently?",
+  a:["2800","level 2800"]}
 ],
+
 normal:[
- {q:"Fruit that can walk on water?",
-  answers:["ice"]},
+ {q:"Fruit that allows walking on water?",
+  a:["ice"]},
  {q:"NPC who gives Instinct V2?",
-  answers:["usopp"]},
- {q:"Which sea has Mirage Island?",
-  answers:["third sea","sea 3","sea three"]}
+  a:["usopp","sogeking"]},
+ {q:"Sea where Mirage Island spawns?",
+  a:["third sea","sea 3","sea three"]}
 ],
+
 hard:[
- {q:"Sword needed with Tushita to get CDK?",
-  answers:["yama"]},
- {q:"Race fastest on land?",
-  answers:["mink"]},
- {q:"Boss related to Blue Gear?",
-  answers:["mirage","mirage island"]}
+ {q:"Sword needed with Tushita for CDK?",
+  a:["yama"]},
+ {q:"Fastest race on land?",
+  a:["mink"]},
+ {q:"Item related to Mirage Island?",
+  a:["blue gear","gear"]}
 ],
+
 xhard:[
  {q:"Most used PvP sword?",
-  answers:["cursed dual katana","cdk"]},
- {q:"Fruit dominating PvP?",
-  answers:["dough"]},
- {q:"Sea needed for Race V4?",
-  answers:["third sea","sea 3","sea three"]}
+  a:["cursed dual katana","cdk"]},
+ {q:"Top PvP fruit?",
+  a:["dough","portal"]},
+ {q:"Sea required for Race V4?",
+  a:["third sea","sea 3","sea three"]}
 ],
+
 xxhard:[
- {q:"Explain a Dough + CDK combo and how you know it works",
+ {q:"Explain a Dough + CDK combo (any valid one)",
   subjective:true},
- {q:"Create Leopard combo with timing explanation",
+ {q:"Create a Leopard PvP combo and explain timing",
   subjective:true}
 ]
 };
 
 function login(){
-  if(document.getElementById("pass").value!==PASSWORD){
-    alert("Wrong password");
+  if(document.getElementById("quizPass").value!==QUIZ_PASSWORD){
+    alert("Wrong quiz password");
     return;
   }
   player=document.getElementById("name").value;
   document.getElementById("login").style.display="none";
-  document.getElementById("levels").style.display="block";
+  document.getElementById("levels").classList.remove("hidden");
 }
 
 function start(lvl){
   levelNow=lvl; score=0;
-  document.getElementById("levels").style.display="none";
+  document.getElementById("levels").classList.add("hidden");
   const q=document.getElementById("quiz");
   q.innerHTML="";
   quiz[lvl].forEach((x,i)=>{
@@ -136,16 +149,38 @@ function submit(){
     if(x.subjective){
       score+=5;
       out+=`<p class="correct">Q${i+1}: Subjective ✔</p>`;
-    }else if(x.answers.some(a=>ans.includes(a))){
+    }
+    else if(x.a.some(v=>ans.includes(v))){
       score+=5;
       out+=`<p class="correct">Q${i+1}: Correct ✔</p>`;
-    }else{
-      out+=`<p class="wrong">Q${i+1}: Wrong ❌ (Accepted: ${x.answers.join(", ")})</p>`;
+    }
+    else{
+      out+=`<p class="wrong">Q${i+1}: Wrong ❌</p>`;
     }
   });
   document.getElementById("quiz").innerHTML="";
   document.getElementById("result").innerHTML=
     `<h2>Score: ${score}</h2>`+out;
+}
+
+function showAnswers(){
+  if(document.getElementById("adminPass").value!==ADMIN_PASSWORD){
+    alert("Wrong admin password");
+    return;
+  }
+  let html="<h3>Answer Key</h3>";
+  for(let l in quiz){
+    html+=`<b>${l.toUpperCase()}</b><br>`;
+    quiz[l].forEach(q=>{
+      html+= q.subjective
+        ? "• Subjective (Any valid answer)<br>"
+        : "• "+q.q+" → "+q.a.join(" / ")+"<br>";
+    });
+    html+="<br>";
+  }
+  const a=document.getElementById("answers");
+  a.innerHTML=html;
+  a.classList.remove("hidden");
 }
 </script>
 
